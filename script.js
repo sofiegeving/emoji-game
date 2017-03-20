@@ -11,7 +11,7 @@ var robot = {
 };
 
 //define the emojis 
-var emojis = ['🤑','🙈','👑','🎓','🐨','🍑'];
+var emojis = ['🤑','🙈','👑','🎓','🍕','🍑'];
 var pizza = '🍕';
 
 //define state 
@@ -20,6 +20,8 @@ var currentRound = 0;
 var startNextRound = function () {
 	// round +1 
 	currentRound ++;
+
+	console.log('Round', currentRound);
 
 	// robot and user to be assigned random emojis
 	robot.currentEmoji = getRandomEmoji();
@@ -42,13 +44,15 @@ var snap = function (robotCalledSnap) {
 	// if user gets it wrong then robot gets +1 to roundsWon 
 	// notification of what happened - console/ui/html 
 
-	var snap = false; 
-	if (robot.currentEmoji == user.currentEmoji) {
+	//check for undefined emojis 
+	if (robot.currentEmoji == undefined || user.currentEmoji == undefined) {
+		return false;
+	}
+
+	var snap = robot.currentEmoji == user.currentEmoji;
+
+	if (robot.currentEmoji == pizza || user.currentEmoji == pizza) {
 		snap = true; 
-	} else if (robot.currentEmoji == pizza) {
-		snap = true; 
-	} else if (user.currentEmoji == pizza) {
-		snap = true;
 	}
 
 	console.group('Snap called by: '+ (robotCalledSnap ? 'Robot' : 'User'));
@@ -73,6 +77,20 @@ var snap = function (robotCalledSnap) {
 			console.log('you lost the round')
 		}
 	}
+
+	console.log('user: ', user.roundsWon, 'Robot: ', robot.roundsWon)
+
+	robot.currentEmoji = undefined;
+	user.currentEmoji = undefined;
+
+	if (user.roundsWon == 3) {
+		console.log('you won the game!!')
+		console.log('game over')
+	}	else if (robot.roundsWon == 4) {
+		console.log('robot won the game!!')
+		console.log('game over')
+	}
+
 
 	console.groupEnd();
 };
