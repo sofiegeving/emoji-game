@@ -31,8 +31,17 @@ var pizza = '🍕';
 var currentRound = 0; 
 var count = countdownFrom; 
 
+// HTML stuff 
+var instructions = document.getElementById('instructions');
+
 var start = function() {
 	countdown();
+
+	//instructions.className = 'instructions hide';
+	instructions.classList.add('hide');
+	setTimeout(function () {
+		instructions.parentNode.removeChild(instructions)
+	}, 510)
 }
 
 var countdown = function () {
