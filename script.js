@@ -1,10 +1,12 @@
 // settings 
 var roundsToWin = 3; 
-var countdownFrom = 5;
-var newRoundStartsIn = 6000; 
+var countdownFrom = 3;
+var newRoundStartsIn = 4000; 
 var newRoundStartsInFromSnap = 4000; 
 var robotCallsIn = 2000; 
 var countdownSpeed = 500;
+var noticeShowTime = 1200;
+var noticeDelay = 1000;
 
 // timers
 var newRoundTimer = undefined; 
@@ -25,6 +27,7 @@ var robot = {
 
 //define the emojis 
 var emojis = ['🤑','🙈','👑','🎓','🍕','🍑'];
+var startingEmoji = '❤️'
 var pizza = '🍕';
 
 //define state 
@@ -33,11 +36,24 @@ var count = countdownFrom;
 
 // HTML stuff 
 var instructions = document.getElementById('instructions');
+var countdownNode = document.getElementById('countdown');
+var userEmojiNode = document.getElementById('user-emoji');
+var robotEmojiNode = document.getElementById('robot-emoji');
+var currentRoundNode = document.getElementById('current-round');
+var noticeNode = document.getElementById('notice');
+
+
+// Event listeners 
+
+
+//do some initial stuff
+userEmojiNode.innerText = startingEmoji;
+robotEmojiNode.innerText = startingEmoji;
 
 var start = function() {
 	countdown();
 
-	//instructions.className = 'instructions hide';
+	//Change the interface 
 	instructions.classList.add('hide');
 	setTimeout(function () {
 		instructions.parentNode.removeChild(instructions)
@@ -45,13 +61,15 @@ var start = function() {
 }
 
 var countdown = function () {
-	console.clear();
 	if (count != 0) {
 		console.log('count', count);
+		countdownNode.innerText = count;
+		countdownNode.classList.remove('hide');
 	}
 
 	if (count <= 0) {
 		count = countdownFrom;
+		countdownNode.classList.add('hide');
 		startNextRound();
 		return; 
 	} else {
@@ -66,10 +84,13 @@ var startNextRound = function () {
 	currentRound ++;
 
 	console.log('Round', currentRound);
+	currentRoundNode.innerText = currentRound;
 
 	// robot and user to be assigned random emojis
 	robot.currentEmoji = getRandomEmoji();
 	user.currentEmoji = getRandomEmoji();
+	userEmojiNode.innerText = user.currentEmoji;
+	robotEmojiNode.innerText = robot.currentEmoji;
 
 	// robot calls snap 
 	if (isAMatch()) {
@@ -97,6 +118,29 @@ var getRandomEmoji = function () {
 	return randomEmoji;
 };
 
+var createNewNotice = function (noticeText, persist, delay) {
+	var newNotice = document.createElement('div');
+	newNotice.innerHTML = '<span>' + noticeText + '</span>';
+	newNotice.classList.add('hide');
+
+	if (!delay) delay = 0;
+
+
+	noticeNode.appendChild(newNotice);
+	setTimeout(function () {
+			newNotice.classList.remove('hide');
+	}, 10+delay);
+
+	if (!persist) {
+		setTimeout(function () {
+			newNotice.classList.add('hide');
+			setTimeout(function () {
+				noticeNode.removeChild(newNotice);
+		 	}, 260);
+		}, noticeShowTime+delay);
+	}
+}
+
 var snap = function (robotCalledSnap) {
 	// compare between the two emojis 
 	// if it is the pizza then snap is true 
@@ -109,10 +153,12 @@ var snap = function (robotCalledSnap) {
 		return false;
 	}
 
+
 	clearTimeout(newRoundTimer);
 
 	var snap = isAMatch();
-
+	
+	createNewNotice('SNAP! by '+(robotCalledSnap ? '🤖' : '👩🏽'));
 	console.group('Snap called by: '+ (robotCalledSnap ? 'Robot' : 'User'));
 
 	//robot called 
@@ -120,9 +166,12 @@ var snap = function (robotCalledSnap) {
 		if (snap) {
 			robot.roundsWon ++;
 			console.log('robot won the round')
+			createNewNotice('🤖 won the round! 💯', false, noticeDelay);
+
 		} else {
 			user.roundsWon ++;
 			console.log('robot lost the round')
+			createNewNotice('🤖 lost the round! 😢', false, noticeDelay);
 		}
 	
 	//user called
@@ -130,9 +179,11 @@ var snap = function (robotCalledSnap) {
 		if (snap) {
 			user.roundsWon ++;
 			console.log('you won the round')
+			createNewNotice('👩🏽 won the round! 💯', false, noticeDelay);
 		} else {
 			robot.roundsWon ++;
 			console.log('you lost the round')
+			createNewNotice('👩🏽 lost the round! 😢', false, noticeDelay);
 		}
 	}
 
@@ -144,9 +195,11 @@ var snap = function (robotCalledSnap) {
 	if (user.roundsWon == roundsToWin) {
 		console.log('you won the game!!')
 		console.log('game over')
+		createNewNotice('👩🏽 won the game 🎉', true, noticeDelay*2);
 	}	else if (robot.roundsWon == roundsToWin) {
 		console.log('robot won the game!!')
 		console.log('game over')
+		createNewNotice('🤖 won the game 😭', true, noticeDelay*2);
 	} else {
 		newRoundTimer = setTimeout(countdown, newRoundStartsInFromSnap);
 	}
