@@ -1,9 +1,9 @@
 // settings 
 var roundsToWin = 3; 
 var countdownFrom = 3;
-var newRoundStartsIn = 4000; 
-var newRoundStartsInFromSnap = 4000; 
-var robotCallsIn = 2000; 
+var newRoundStartsIn = 3500; 
+var newRoundStartsInFromSnap = 3500; 
+var robotCallsIn = 900; 
 var countdownSpeed = 500;
 var noticeShowTime = 1200;
 var noticeDelay = 1000;
@@ -290,24 +290,4 @@ var snap = function (robotCalledSnap) {
 
 	console.groupEnd();
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
